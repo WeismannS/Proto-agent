@@ -5,7 +5,7 @@ from functions.is_in_boundary import is_in_boundary
 def get_file_content(working_directory : str, file_path : str):
     res = ""
     path = (Path(working_directory) / file_path).resolve()
-    if  is_in_boundary(Path(working_directory), path) :
+    if  is_in_boundary(Path(working_directory), path) == False :
         return f'Error: Cannot list "{file_path}" as it is outside the permitted working directory'
     try : 
         if not path.is_file() :

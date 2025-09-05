@@ -7,7 +7,7 @@ def get_files_info(working_directory : str, directory=".") :
     files_data = ""
     path = (Path(working_directory) / directory).resolve()
     try :
-        if is_in_boundary(Path(working_directory), path) :
+        if is_in_boundary(Path(working_directory), path) == False :
                 return f'Error: Cannot list "{directory}" as it is outside the permitted working directory'
         if not path.is_dir() :
             return f'Error: "{directory}" is not a directory'
