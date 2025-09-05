@@ -1,0 +1,22 @@
+from pathlib import Path
+from Config import MAX_BYTES
+from functions.is_in_boundary import is_in_boundary
+
+def get_file_content(working_directory : str, file_path : str):
+    res = ""
+    path = (Path(working_directory) / file_path).resolve()
+    if  is_in_boundary(Path(working_directory), path) :
+        return f'Error: Cannot list "{file_path}" as it is outside the permitted working directory'
+    try : 
+        if not path.is_file() :
+             return  f'Error: File not found or is not a regular file: "{file_path}"' 
+        with open(path) as f :
+                res = f.read(MAX_BYTES)
+        metadata = path.stat()
+        if metadata.st_size > MAX_BYTES :
+            res += f'[...File "{file_path}" truncated at 10000 characters]'
+    except Exception as E :
+        return f"Error: {E}" 
+    return res
+            
+
