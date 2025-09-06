@@ -1,5 +1,3 @@
-# calculator.py
-
 class Calculator:
     def __init__(self):
         self.operators = {
@@ -8,56 +6,49 @@ class Calculator:
             "*": lambda a, b: a * b,
             "/": lambda a, b: a / b,
             "^": lambda a, b: a ** b,
+            "%": lambda a, b: a % b
         }
+
         self.precedence = {
             "+": 1,
             "-": 1,
             "*": 2,
             "/": 2,
             "^": 3,
+            "%": 2
         }
 
     def evaluate(self, expression):
-        if not expression or expression.isspace():
+        if not expression:
             return None
-        tokens = expression.strip().split()
-        return self._evaluate_infix(tokens)
-
-    def _evaluate_infix(self, tokens):
         values = []
         operators = []
+        tokens = expression.split()
 
         for token in tokens:
-            if token in self.operators:
-                while (
-                    operators
-                    and operators[-1] in self.operators
-                    and self.precedence[operators[-1]] >= self.precedence[token]
-                ):
-                    self._apply_operator(operators, values)
+            if token.isdigit():
+                values.append(int(token))
+            elif token in self.operators:
+                while operators and self.precedence[token] <= self.precedence.get(operators[-1], 0):
+                    self._apply_op(values, operators.pop())
                 operators.append(token)
+            elif token == '(':  # Handle parentheses
+                operators.append(token)
+            elif token == ')':
+                while operators and operators[-1] != '(':  # Find matching left parenthesis
+                    self._apply_op(values, operators.pop())
+                operators.pop()  # Remove left parenthesis
             else:
-                try:
-                    values.append(float(token))
-                except ValueError:
-                    raise ValueError(f"invalid token: {token}")
+                raise ValueError("Invalid token: " + token)
 
         while operators:
-            self._apply_operator(operators, values)
-
-        if len(values) != 1:
-            raise ValueError("invalid expression")
+            self._apply_op(values, operators.pop())
 
         return values[0]
 
-    def _apply_operator(self, operators, values):
-        if not operators:
-            return
-
-        operator = operators.pop()
+    def _apply_op(self, values, op):
         if len(values) < 2:
-            raise ValueError(f"not enough operands for operator {operator}")
-
-        b = values.pop()
-        a = values.pop()
-        values.append(self.operators[operator](a, b))
+            raise ValueError("Not enough operands")
+        right = values.pop()
+        left = values.pop()
+        values.append(self.operators[op](left, right))

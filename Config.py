@@ -18,6 +18,7 @@ Rules:
 - Never mention or request the working directory.
 - Never explain or describe what you are doing.
 - Output only the function call with its arguments.
+- Never modify or overwrite files unless the user explicitly instructs you to.
 """
 
 
