@@ -1,12 +1,23 @@
 from pathlib import Path
 from Config import MAX_BYTES
 from functions.is_in_boundary import is_in_boundary
+from google.genai import types
+
+schema_get_file_content = types.FunctionDeclaration(
+    name="get_file_content",
+    description="function to read content of a certain a file",
+    parameters= types.Schema(type=types.Type.OBJECT,
+                             properties= {
+                                "file_path" : types.Schema(type=types.Type.STRING,
+                                                         description="path for file to be read")
+                             }
+))
 
 def get_file_content(working_directory : str, file_path : str):
     res = ""
     path = (Path(working_directory) / file_path).resolve()
     if  is_in_boundary(Path(working_directory), path) == False :
-        return f'Error: Cannot list "{file_path}" as it is outside the permitted working directory'
+        return f'Error: Cannot read "{file_path}" as it is outside the permitted working directory'
     try : 
         if not path.is_file() :
              return  f'Error: File not found or is not a regular file: "{file_path}"' 

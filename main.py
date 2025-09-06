@@ -1,17 +1,26 @@
-from pyexpat.errors import messages
 import sys
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 import os
-
+from feedback_loop import generate_content
+from functions.call_function import call_function
+from functions.get_files_info import schema_get_files_info
+from functions.write_file import schema_write_file
+from functions.get_file_content import schema_get_file_content
+from functions.run_python_file import schema_run_python_file
+from Config import SYSTEM_PROMPT
 def main(api_key : str, verbose : bool = False) :
     prompt = sys.argv[1]
     messages = [types.Content(role="user",parts=[types.Part(text=prompt)])]
     gemini_client = genai.Client(api_key=api_key)
+    system_prompt = SYSTEM_PROMPT
 
-    response = gemini_client.models.generate_content(model="gemini-2.0-flash-001",contents=messages)
-
+    tools = types.Tool(function_declarations=[schema_get_files_info,schema_run_python_file, schema_get_file_content,schema_write_file])
+    
+    response = generate_content(gemini_client,tools,verbose, prompt)
+    if not response :
+        return
     print(response.text)
     if (verbose and response.usage_metadata) :
         print(f"User prompt: {prompt}")
