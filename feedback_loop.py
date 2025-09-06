@@ -18,7 +18,8 @@ def generate_content(client : Client, tools : types.Tool, verbose : bool, prompt
                 raise Exception("Fatal error, function call yields nothing!")
             if function_res.parts[0].function_response and  function_res.parts[0].function_response.response and verbose:
                 print(f"-> {function_res.parts[0].function_response.response}")
-            messages.append(types.Part.from_function_call(name=function_call.name, args=function_call.args))
+            if function_call.name and function_call.args:
+                messages.append(types.Part.from_function_call(name=function_call.name, args=function_call.args))
             messages.append(function_res)
         return generate_content(client, tools, verbose=verbose, messages=messages)
     return response
