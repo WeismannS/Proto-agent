@@ -5,8 +5,8 @@ from google.genai import types
 
 schema_get_file_content = types.FunctionDeclaration(
     name="get_file_content",
-    description="function to read content of a certain a file",
-    parameters= types.Schema(type=types.Type.OBJECT,
+        description= "Read the contents of a file and return them. Returns the full file content on success.",
+        parameters= types.Schema(type=types.Type.OBJECT,
                              properties= {
                                 "file_path" : types.Schema(type=types.Type.STRING,
                                                          description="path for file to be read")

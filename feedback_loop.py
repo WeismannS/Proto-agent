@@ -5,21 +5,61 @@ from google.genai import types,Client
 from Config import MODEL, SYSTEM_PROMPT
 from functions.call_function import call_function
 
-
-def generate_content(client : Client, tools : types.Tool, verbose : bool, prompt :str | None = None, messages : List[types.Content | types.Part] = []) :
-    if not messages :
-        messages = [types.Content(role="user",parts=[types.Part(text=prompt)])]
-    response = client.models.generate_content(contents=messages, model=MODEL, config=types.GenerateContentConfig(tools=[tools], system_instruction=SYSTEM_PROMPT))
-    if response.function_calls :
-        for function_call in response.function_calls :
-            print(f"Calling function: {function_call.name}({function_call.args})")
+def generate_content(
+    client: Client,
+    tools: types.Tool,
+    verbose: bool,
+    prompt: str | None = None,
+    messages: List[types.Content] | None = None,
+    max_iterations: int = 10
+) -> types.GenerateContentResponse:
+    if messages is None:
+        if prompt is None:
+            raise ValueError("Either prompt or messages must be provided")
+        messages = [types.Content(role="user", parts=[types.Part(text=prompt)])]
+    
+    working_messages = messages.copy()
+    iterations = 0
+    
+    while iterations < max_iterations:
+        response = client.models.generate_content(
+            contents=working_messages,
+            model=MODEL,
+            config=types.GenerateContentConfig(tools=[tools], system_instruction=SYSTEM_PROMPT)
+        )
+        
+        if not response.function_calls:
+            return response
+            
+        function_parts = []
+        
+        for function_call in response.function_calls:
+            if verbose:
+                print(f"Calling function: {function_call.name}({function_call.args})")
+            
             function_res = call_function(function_call, verbose)
-            if function_res.parts == None or (function_res.parts and  function_res.parts[0].function_response == None):
-                raise Exception("Fatal error, function call yields nothing!")
-            if function_res.parts[0].function_response and  function_res.parts[0].function_response.response and verbose:
+            if (function_res.parts is None or 
+                not function_res.parts or 
+                function_res.parts[0].function_response is None):
+                raise Exception(f"Function {function_call.name} returned no response")
+            
+            if (verbose and 
+                function_res.parts[0].function_response and 
+                function_res.parts[0].function_response.response):
                 print(f"-> {function_res.parts[0].function_response.response}")
-            if function_call.name and function_call.args:
-                messages.append(types.Part.from_function_call(name=function_call.name, args=function_call.args))
-            messages.append(function_res)
-        return generate_content(client, tools, verbose=verbose, messages=messages)
-    return response
+            
+            function_parts.append(
+                types.Part.from_function_call(
+                    name=function_call.name, 
+                    args=function_call.args
+                )
+            )
+            function_parts.extend(function_res.parts)
+
+        working_messages.append(
+            types.Content(role="model", parts=function_parts)
+        )
+        
+        iterations += 1
+    
+    raise Exception(f"Maximum function call iterations ({max_iterations}) exceeded")
