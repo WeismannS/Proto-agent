@@ -21,28 +21,32 @@ class Calculator:
     def evaluate(self, expression):
         if not expression:
             return None
+
         values = []
         operators = []
         tokens = expression.split()
 
         for token in tokens:
-            if token.isdigit():
-                values.append(int(token))
+            if token.isdigit() or '.' in token:
+                values.append(float(token))
             elif token in self.operators:
                 while operators and self.precedence[token] <= self.precedence.get(operators[-1], 0):
                     self._apply_op(values, operators.pop())
                 operators.append(token)
-            elif token == '(':  # Handle parentheses
+            elif token == '(':
                 operators.append(token)
             elif token == ')':
-                while operators and operators[-1] != '(':  # Find matching left parenthesis
+                while operators and operators[-1] != '(':
                     self._apply_op(values, operators.pop())
-                operators.pop()  # Remove left parenthesis
+                operators.pop()
             else:
                 raise ValueError("Invalid token: " + token)
 
         while operators:
             self._apply_op(values, operators.pop())
+
+        if len(values) != 1:
+            raise ValueError("Invalid expression")
 
         return values[0]
 
@@ -52,3 +56,9 @@ class Calculator:
         right = values.pop()
         left = values.pop()
         values.append(self.operators[op](left, right))
+
+if __name__ == "__main__":
+    calculator = Calculator()
+    expression = "3 + 7 * 2"
+    result = calculator.evaluate(expression)
+    print(result)

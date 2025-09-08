@@ -1,5 +1,5 @@
 
-# AI-Agent
+# Proto-agent
 
 > **Disclaimer:**
 > This project is **merely an introduction to AI agents**, created as a personal learning exercise. It is not intended for production use. The code and design are experimental and may lack robustness, security, or best practices required for real-world deployment, Simply put, **do not use this for anything else than simple experimentation**.
