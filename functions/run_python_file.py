@@ -7,13 +7,18 @@ from google.genai import types
 
 schema_run_python_file = types.FunctionDeclaration(
     name="run_python_file",
-    description="Execute a Python file located in the calculator directory. Returns the program output",
+    description="Execute a Python file located in the calculator directory. Returns the program output or an error.",
     parameters=types.Schema(
         type=types.Type.OBJECT,
         properties={
             "file_path": types.Schema(
                 type=types.Type.STRING,
-                description="Relative file path (within calculator directory) to the Python file to be executed."
+                description="Relative path to the Python file to execute."
+            ),
+            "args": types.Schema(
+                type=types.Type.ARRAY,
+                items=types.Schema(type=types.Type.STRING),
+                description="Command-line arguments to pass to the Python file."
             )
         },
         required=["file_path"]
