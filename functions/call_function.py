@@ -34,7 +34,7 @@ def call_function(function_call_part : types.FunctionCall, verbose=False):
         print(f"Calling function: {function_call_part.name}({function_call_part.args})")
     else :
         print(f" - Calling function: {function_call_part.name}")
-    args_dict = dict(function_call_part.args) if function_call_part.args else {}
+    args_dict = (function_call_part.args) if function_call_part.args else {}
     res = function_to_run("./calculator", **args_dict)
     return types.Content(
     role="tool",
