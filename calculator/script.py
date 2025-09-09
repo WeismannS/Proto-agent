@@ -1,1 +1,0 @@
-print('this nigga is retarded')

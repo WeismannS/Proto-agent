@@ -1,4 +1,5 @@
 from google.genai import types
+from Config import ENTRY
 from functions import run_python_file
 from functions.get_file_content import get_file_content
 from functions.get_files_info import get_files_info
@@ -35,7 +36,7 @@ def call_function(function_call_part : types.FunctionCall, verbose=False):
     else :
         print(f" - Calling function: {function_call_part.name}")
     args_dict = (function_call_part.args) if function_call_part.args else {}
-    res = function_to_run("./calculator", **args_dict)
+    res = function_to_run(ENTRY, **args_dict)
     return types.Content(
     role="tool",
     parts=[

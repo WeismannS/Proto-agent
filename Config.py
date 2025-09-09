@@ -59,3 +59,5 @@ Use this mode for:
 
 
 MODEL="gemini-2.0-flash-001"
+
+ENTRY="./calculator"
