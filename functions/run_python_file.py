@@ -1,6 +1,4 @@
 from pathlib import Path
-from token import STRING
-from typing import Type
 from functions.is_in_boundary import is_in_boundary
 from subprocess import run
 from google.genai import types
@@ -28,9 +26,9 @@ schema_run_python_file = types.FunctionDeclaration(
 
 def run_python_file(working_directory: str, file_path: str, args=[]):
     path = (Path(working_directory) / file_path).resolve()
-    if is_in_boundary(Path(working_directory).resolve(), path) == False:
+    if not is_in_boundary(Path(working_directory).resolve(), path):
         return f'Error: Cannot execute "{file_path}" as it is outside the permitted working directory'
-    if path.exists() == False:
+    if not path.exists():
         return f'Error: File "{file_path}" not found.'
     index = path.name.rfind(".")
     if index == -1 or path.name[index:] != ".py":

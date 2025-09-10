@@ -51,7 +51,7 @@ def generate_content(
             function_res = call_function(function_call, verbose, allow_exec)
 
             if (
-                function_res.parts == None
+                function_res.parts is None
                 or not function_res.parts
                 or function_res.parts[0].function_response is None
             ):

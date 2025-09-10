@@ -1,4 +1,3 @@
-from typing import List
 from pathlib import Path
 from functions.is_in_boundary import is_in_boundary
 from google.genai import types
@@ -22,7 +21,7 @@ def get_files_info(working_directory: str, directory="."):
     files_data = ""
     path = (Path(working_directory) / directory).resolve()
     try:
-        if is_in_boundary(Path(working_directory), path) == False:
+        if not is_in_boundary(Path(working_directory), path):
             return f'Error: Cannot list "{directory}" as it is outside the permitted working directory'
         if not path.is_dir():
             return f'Error: "{directory}" is not a directory'

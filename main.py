@@ -3,7 +3,6 @@ from google import genai
 from google.genai import types
 import os
 from feedback_loop import generate_content
-from functions.call_function import call_function
 from functions.get_files_info import schema_get_files_info
 from functions.write_file import schema_write_file
 from functions.get_file_content import schema_get_file_content
@@ -49,6 +48,6 @@ if __name__ == "__main__":
     print(args)
     load_dotenv()
     api_key = os.environ.get("GEMINI_API_KEY")
-    if api_key == None:
+    if api_key is None:
         raise Exception("Please provide an api key in your .env")
     main(api_key, args)

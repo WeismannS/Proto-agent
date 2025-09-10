@@ -20,7 +20,7 @@ schema_get_file_content = types.FunctionDeclaration(
 def get_file_content(working_directory: str, file_path: str):
     res = ""
     path = (Path(working_directory) / file_path).resolve()
-    if is_in_boundary(Path(working_directory), path) == False:
+    if not is_in_boundary(Path(working_directory), path):
         return f'Error: Cannot read "{file_path}" as it is outside the permitted working directory'
     try:
         if not path.is_file():

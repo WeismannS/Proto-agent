@@ -38,12 +38,12 @@ def _get_user_confirmation(file_path: str, args: dict) -> bool:
 def call_function(
     function_call_part: types.FunctionCall, verbose=False, allow_exec=False
 ):
-    if function_call_part.name == None:
+    if function_call_part.name is None:
         return _create_error_response(
             "Invalid function", f"Unknown function: {function_call_part.name}"
         )
     function_to_run = FUNCTIONS_TABLE.get(function_call_part.name)
-    if function_to_run == None:
+    if function_to_run is None:
         return _create_error_response(
             "Invalid function", f"Unknown function: {function_call_part.name}"
         )
@@ -51,7 +51,7 @@ def call_function(
         print(f"Calling function: {function_call_part.name}({function_call_part.args})")
     else:
         print(f" - Calling function: {function_call_part.name}")
-    if function_to_run == run_python_file and allow_exec == False:
+    if function_to_run == run_python_file and not allow_exec:
         function_arguments = function_call_part.args if function_call_part.args else {}
         file_path = function_arguments.get("file_path", "")
 
