@@ -7,13 +7,17 @@ from functions.get_files_info import schema_get_files_info
 from functions.write_file import schema_write_file
 from functions.get_file_content import schema_get_file_content
 from functions.run_python_file import schema_run_python_file
-import argparse
+import click
 
-
-def main(api_key: str, args: argparse.Namespace):
-    verbose = args.verbose
-    allow_exec = args.allow_exec
-    prompt = args.prompt
+@click.command()
+@click.argument("prompt")
+@click.option("--working-directory", default="./calculator", help="The directory the agent can operate in")
+@click.option("-v", "--verbose", is_flag=True, help="Enable detailed logging")
+@click.option("-a", "--allow-exec", is_flag=True, help="Allow code execution without prompting")
+def main(prompt: str, working_directory: str, verbose: bool, allow_exec: bool):
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if api_key is None:
+        raise Exception("Please provide an api key in your .env")
     tool = types.Tool(
         function_declarations=[
             schema_get_files_info,
@@ -24,7 +28,7 @@ def main(api_key: str, args: argparse.Namespace):
     )
     configuration = AgentConfig(
         api_key=api_key,
-        working_directory="./calculator",
+        working_directory=working_directory,
         tools=[tool],
         allow_exec=allow_exec,
         verbose=verbose,
@@ -41,16 +45,5 @@ def main(api_key: str, args: argparse.Namespace):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        prog="Proto-agent",
-        description="an Ai agent that can read, write and run python files in a contained directory",
-    )
-    parser.add_argument("prompt", type=str)
-    parser.add_argument("-v", "--verbose", required=False, action="store_true")
-    parser.add_argument("-a", "--allow-exec", required=False, action="store_true")
-    args = parser.parse_args()
     load_dotenv()
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if api_key is None:
-        raise Exception("Please provide an api key in your .env")
-    main(api_key, args)
+    main()
