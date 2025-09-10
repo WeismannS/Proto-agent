@@ -1,4 +1,3 @@
-from email import message
 from typing import List
 from google.genai import types,Client
 
@@ -59,8 +58,8 @@ def generate_content(
                 function_res.parts[0].function_response and
                 function_res.parts[0].function_response.response):
                 print(f"-> {function_res.parts[0].function_response.response}")
-           
-        function_response_parts.extend(function_res.parts)
+            function_response_parts.extend(function_res.parts)
+    
         working_messages.append(
             types.Content(role="user", parts=function_response_parts)
         )
