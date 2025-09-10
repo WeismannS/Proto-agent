@@ -1,4 +1,4 @@
-MAX_BYTES = 10_000 # Max Bytes read from a file
+MAX_BYTES = 10_000  # Max Bytes read from a file
 
 
 SYSTEM_PROMPT = """
@@ -56,8 +56,6 @@ Use this mode for:
 """
 
 
+MODEL = "gemini-2.0-flash-001"
 
-
-MODEL="gemini-2.0-flash-001"
-
-ENTRY="./calculator" # Directory the agent is allowed to read, write and execute in
+ENTRY = "./calculator"  # Directory the agent is allowed to read, write and execute in

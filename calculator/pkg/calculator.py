@@ -5,18 +5,11 @@ class Calculator:
             "-": lambda a, b: a - b,
             "*": lambda a, b: a * b,
             "/": lambda a, b: a / b,
-            "^": lambda a, b: a ** b,
-            "%": lambda a, b: a % b
+            "^": lambda a, b: a**b,
+            "%": lambda a, b: a % b,
         }
 
-        self.precedence = {
-            "+": 1,
-            "-": 1,
-            "*": 2,
-            "/": 2,
-            "^": 3,
-            "%": 2
-        }
+        self.precedence = {"+": 1, "-": 1, "*": 2, "/": 2, "^": 3, "%": 2}
 
     def evaluate(self, expression):
         if not expression:
@@ -27,16 +20,18 @@ class Calculator:
         tokens = expression.split()
 
         for token in tokens:
-            if token.isdigit() or '.' in token:
+            if token.isdigit() or "." in token:
                 values.append(float(token))
             elif token in self.operators:
-                while operators and self.precedence[token] <= self.precedence.get(operators[-1], 0):
+                while operators and self.precedence[token] <= self.precedence.get(
+                    operators[-1], 0
+                ):
                     self._apply_op(values, operators.pop())
                 operators.append(token)
-            elif token == '(':
+            elif token == "(":
                 operators.append(token)
-            elif token == ')':
-                while operators and operators[-1] != '(':
+            elif token == ")":
+                while operators and operators[-1] != "(":
                     self._apply_op(values, operators.pop())
                 operators.pop()
             else:
@@ -56,6 +51,7 @@ class Calculator:
         right = values.pop()
         left = values.pop()
         values.append(self.operators[op](left, right))
+
 
 if __name__ == "__main__":
     calculator = Calculator()

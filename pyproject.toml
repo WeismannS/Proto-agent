@@ -8,3 +8,8 @@ dependencies = [
     "google-genai[typing,typings]==1.12.1",
     "python-dotenv==1.1.0",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.12.12",
+]

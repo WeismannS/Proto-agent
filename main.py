@@ -8,32 +8,47 @@ from functions.get_files_info import schema_get_files_info
 from functions.write_file import schema_write_file
 from functions.get_file_content import schema_get_file_content
 from functions.run_python_file import schema_run_python_file
-from Config import SYSTEM_PROMPT
 import argparse
 
 
-def main(api_key : str, prompt : str, verbose : bool = False) :
+def main(api_key: str, args: argparse.Namespace):
+    verbose = args.verbose
+    allow_exec = args.allow_exec
+    prompt = args.prompt
     gemini_client = genai.Client(api_key=api_key)
-    tools = types.Tool(function_declarations=[schema_get_files_info,schema_run_python_file, schema_get_file_content,schema_write_file])
-    
-    response = generate_content(gemini_client,tools,verbose, prompt)
-    if not response :
+    tools = types.Tool(
+        function_declarations=[
+            schema_get_files_info,
+            schema_run_python_file,
+            schema_get_file_content,
+            schema_write_file,
+        ]
+    )
+
+    response = generate_content(
+        gemini_client, tools, verbose=verbose, prompt=prompt, allow_exec=allow_exec
+    )
+    if not response:
         return
     print(response.text)
-    if (verbose and response.usage_metadata) :
+    if verbose and response.usage_metadata:
         print(f"User prompt: {prompt}")
         print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
         print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
 
 
-if __name__ == "__main__" :
-    parser = argparse.ArgumentParser(prog="Proto-agent", description="an Ai agent that can read, write and run python files in a contained directory")
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        prog="Proto-agent",
+        description="an Ai agent that can read, write and run python files in a contained directory",
+    )
     parser.add_argument("prompt", type=str)
-    parser.add_argument("-v", "--verbose", required=False,action="store_true")
+    parser.add_argument("-v", "--verbose", required=False, action="store_true")
+    parser.add_argument("-a", "--allow-exec", required=False, action="store_true")
     args = parser.parse_args()
+    print(args)
     load_dotenv()
     api_key = os.environ.get("GEMINI_API_KEY")
-    if api_key == None :
+    if api_key == None:
         raise Exception("Please provide an api key in your .env")
-    main(api_key, args.prompt, args.verbose)
-    
+    main(api_key, args)
