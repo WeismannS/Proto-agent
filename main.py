@@ -1,8 +1,8 @@
 from dotenv import load_dotenv
-from google import genai
 from google.genai import types
 import os
-from feedback_loop import generate_content
+from agent_settings import AgentConfig
+from agent import Agent
 from functions.get_files_info import schema_get_files_info
 from functions.write_file import schema_write_file
 from functions.get_file_content import schema_get_file_content
@@ -14,8 +14,7 @@ def main(api_key: str, args: argparse.Namespace):
     verbose = args.verbose
     allow_exec = args.allow_exec
     prompt = args.prompt
-    gemini_client = genai.Client(api_key=api_key)
-    tools = types.Tool(
+    tool = types.Tool(
         function_declarations=[
             schema_get_files_info,
             schema_run_python_file,
@@ -23,10 +22,15 @@ def main(api_key: str, args: argparse.Namespace):
             schema_write_file,
         ]
     )
-
-    response = generate_content(
-        gemini_client, tools, verbose=verbose, prompt=prompt, allow_exec=allow_exec
+    configuration = AgentConfig(
+        api_key=api_key,
+        working_directory="./calculator",
+        tools=[tool],
+        allow_exec=allow_exec,
+        verbose=verbose,
     )
+    agent = Agent(configuration)
+    response = agent.generate_content(prompt=prompt)
     if not response:
         return
     print(response.text)
@@ -45,7 +49,6 @@ if __name__ == "__main__":
     parser.add_argument("-v", "--verbose", required=False, action="store_true")
     parser.add_argument("-a", "--allow-exec", required=False, action="store_true")
     args = parser.parse_args()
-    print(args)
     load_dotenv()
     api_key = os.environ.get("GEMINI_API_KEY")
     if api_key is None:

@@ -54,8 +54,3 @@ Use this mode for:
 - File/code operation request → Function Call Mode
 - Everything else → Natural Language Mode
 """
-
-
-MODEL = "gemini-2.0-flash-001"
-
-ENTRY = "./calculator"  # Directory the agent is allowed to read, write and execute in
