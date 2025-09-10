@@ -52,17 +52,10 @@ def call_function(
     else:
         print(f" - Calling function: {function_call_part.name}")
     if function_to_run == run_python_file and allow_exec == False:
-        file_path = (
-            function_call_part.args.get("file_path", "unknown")
-            if function_call_part.args
-            else "unknown"
-        )
-        args_without_file_path = (
-            {k: v for k, v in function_call_part.args.items() if k != "file_path"}
-            if function_call_part.args
-            else {}
-        )
-        if _get_user_confirmation(file_path, args_without_file_path):
+        function_arguments = function_call_part.args if function_call_part.args else {}
+        file_path = function_arguments.get("file_path", "")
+
+        if _get_user_confirmation(file_path, function_arguments):
             return _create_error_response(
                 function_call_part.name, f"Refused to run {function_call_part.name}"
             )
