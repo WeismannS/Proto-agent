@@ -3,26 +3,8 @@ import os
 from agent_settings import AgentConfig
 from agent import Agent
 import click
-from tools.file_operation_toolkit import FileOperationToolkit
-
-
-def calculate(prompt: str):
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if api_key is None:
-        return "Error"
-    tool = FileOperationToolkit().tool
-    configuration = AgentConfig(
-        api_key=api_key,
-        working_directory="./calculator",
-        tools=[tool],
-        allow_exec=True,
-        verbose=False,
-    )
-    agent = Agent(configuration)
-    response = agent.generate_content(prompt=prompt)
-    if not response:
-        return "Error"
-    return response.text
+from tool_kits.file_operation_toolkit import FileOperationToolkit
+from tool_kits.system_info_toolkit import SystemInfoToolkit
 
 
 @click.command()
@@ -36,17 +18,56 @@ def calculate(prompt: str):
 @click.option(
     "-a", "--allow-exec", is_flag=True, help="Allow code execution without prompting"
 )
-def main_cli(prompt: str, working_directory: str, verbose: bool, allow_exec: bool):
+@click.option(
+    "--read-only", is_flag=True, help="Enable only read operations (no write/execute)"
+)
+@click.option(
+    "--no-system", is_flag=True, help="Disable system monitoring capabilities"
+)
+def main_cli(
+    prompt: str,
+    working_directory: str,
+    verbose: bool,
+    allow_exec: bool,
+    read_only: bool,
+    no_system: bool,
+):
     api_key = os.environ.get("GEMINI_API_KEY")
     if api_key is None:
         raise Exception("Please provide an api key in your .env")
+
+    tools = []
+
+    if read_only:
+        file_toolkit = FileOperationToolkit(
+            enable_read=True, enable_write=False, enable_list=True, enable_execute=False
+        )
+        tools.append(file_toolkit.tool)
+    else:
+        file_toolkit = FileOperationToolkit(
+            enable_read=True, enable_write=True, enable_list=True, enable_execute=True
+        )
+        tools.append(file_toolkit.tool)
+
+    if not no_system:
+        system_toolkit = SystemInfoToolkit(
+            enable_basic=True,
+            enable_memory=True,
+            enable_disk=True,
+            enable_cpu=True,
+            enable_network=False,
+            enable_processes=False,
+        )
+        tools.append(system_toolkit.tool)
+
     configuration = AgentConfig(
         api_key=api_key,
         working_directory=working_directory,
-        tools=[FileOperationToolkit(include_python_execution=True).tool],
+        tools=tools,
         allow_exec=allow_exec,
         verbose=verbose,
     )
+
     agent = Agent(configuration)
     response = agent.generate_content(prompt=prompt)
     if not response:

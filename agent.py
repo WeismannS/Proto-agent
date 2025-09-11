@@ -3,7 +3,6 @@ from google.genai import types, Client
 
 from Config import SYSTEM_PROMPT
 from agent_settings import AgentConfig
-from functions.run_python_file import run_python_file
 from tool_kit_registry import ToolKitRegistery
 
 
@@ -51,7 +50,7 @@ class Agent:
             )
         else:
             print(f" - Calling function: {function_call_part.name}")
-        if function_to_run == run_python_file and not allow_exec:
+        if function_to_run.__name__ == "run_python_file" and not allow_exec:
             function_arguments = (
                 function_call_part.args if function_call_part.args else {}
             )
