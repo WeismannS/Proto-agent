@@ -3,8 +3,7 @@ import os
 from agent_settings import AgentConfig
 from agent import Agent
 import click
-from tool_kits.file_operation_toolkit import FileOperationToolkit
-from tool_kits.system_info_toolkit import SystemInfoToolkit
+from tool_kits import FileOperationToolkit, SystemInfoToolkit
 
 
 @click.command()
