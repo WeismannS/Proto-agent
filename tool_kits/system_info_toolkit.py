@@ -3,7 +3,7 @@ import platform
 import json
 from datetime import datetime
 from tool_kit_registry import ToolKitRegistery
-from google.genai import types
+from types_llm import FunctionDeclaration, Tool
 
 from .base_toolkit import ToolKit
 
@@ -183,56 +183,56 @@ def list_processes(working_directory: str, limit: int = 10) -> str:
         return f"Error: Failed to list processes: {e}"
 
 
-schema_get_system_info = types.FunctionDeclaration(
+schema_get_system_info = FunctionDeclaration(
     name="get_system_info",
     description="Get basic system information including platform, architecture, and Python version",
-    parameters=types.Schema(type=types.Type.OBJECT, properties={}),
+    parameters={"type": "object", "properties": {}},
 )
 
-schema_get_memory_usage = types.FunctionDeclaration(
+schema_get_memory_usage = FunctionDeclaration(
     name="get_memory_usage",
     description="Get current memory usage statistics including virtual and swap memory",
-    parameters=types.Schema(type=types.Type.OBJECT, properties={}),
+    parameters={"type": "object", "properties": {}},
 )
 
-schema_get_disk_usage = types.FunctionDeclaration(
+schema_get_disk_usage = FunctionDeclaration(
     name="get_disk_usage",
     description="Get disk usage information for a specified path",
-    parameters=types.Schema(
-        type=types.Type.OBJECT,
-        properties={
-            "path": types.Schema(
-                type=types.Type.STRING,
-                description="Path to check disk usage for (default: /)",
-            )
+    parameters={
+        "type": "object",
+        "properties": {
+            "path": {
+                "type": "string",
+                "description": "Path to check disk usage for (default: /)",
+            }
         },
-    ),
+    },
 )
 
-schema_get_cpu_info = types.FunctionDeclaration(
+schema_get_cpu_info = FunctionDeclaration(
     name="get_cpu_info",
     description="Get CPU information including core count, frequency, and current usage",
-    parameters=types.Schema(type=types.Type.OBJECT, properties={}),
+    parameters={"type": "object", "properties": {}},
 )
 
-schema_get_network_info = types.FunctionDeclaration(
+schema_get_network_info = FunctionDeclaration(
     name="get_network_info",
     description="Get network interface information including addresses and statistics",
-    parameters=types.Schema(type=types.Type.OBJECT, properties={}),
+    parameters={"type": "object", "properties": {}},
 )
 
-schema_list_processes = types.FunctionDeclaration(
+schema_list_processes = FunctionDeclaration(
     name="list_processes",
     description="List running processes with CPU and memory usage",
-    parameters=types.Schema(
-        type=types.Type.OBJECT,
-        properties={
-            "limit": types.Schema(
-                type=types.Type.INTEGER,
-                description="Maximum number of processes to return (default: 10)",
-            )
+    parameters={
+        "type": "object",
+        "properties": {
+            "limit": {
+                "type": "integer",
+                "description": "Maximum number of processes to return (default: 10)",
+            }
         },
-    ),
+    },
 )
 
 
@@ -307,6 +307,6 @@ class SystemInfoToolkit(ToolKit):
             )
 
     @property
-    def tool(self) -> types.Tool:
+    def tool(self) -> Tool:
         """Get the Tool instance for this toolkit"""
-        return types.Tool(function_declarations=self.schemas)
+        return Tool(function_declarations=self.schemas)

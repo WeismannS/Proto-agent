@@ -1,7 +1,7 @@
 from pathlib import Path
 from subprocess import run
 from tool_kit_registry import ToolKitRegistery
-from google.genai import types
+from types_llm import FunctionDeclaration, Tool
 from .base_toolkit import ToolKit
 from Config import MAX_BYTES
 
@@ -99,25 +99,25 @@ class FileOperationToolkit(ToolKit):
         path = (Path(working_directory) / file_path).resolve()
         if not self._is_in_boundary(Path(working_directory).resolve(), path):
             return f'Error: Cannot execute "{file_path}" as it is outside the permitted working directory'
-        if not path.exists():
-            return f'Error: File "{file_path}" not found.'
-        index = path.name.rfind(".")
-        if index == -1 or path.name[index:] != ".py":
-            return f'Error: "{file_path}" is not a Python file.'
         try:
-            instance = run(
-                ["python3", str(path), *args],
-                timeout=30,
+            if not path.is_file():
+                return f'Error: File not found or is not a regular file: "{file_path}"'
+
+            cmd = ["python", str(path)] + args
+            result = run(
+                cmd,
                 capture_output=True,
-                cwd=Path(working_directory),
-                encoding="utf",
+                text=True,
+                cwd=working_directory,
+                timeout=30,
             )
-            res = ""
-            res += f"STDOUT: {instance.stdout}"
-            res += f"STDERR: {instance.stderr}"
-            if instance.returncode != 0:
-                res += f"Process exited with code {instance.returncode}"
-            if len(instance.stdout) == 0:
+
+            res = f"Exit code: {result.returncode}\n"
+            if result.stdout:
+                res += f"STDOUT:\n{result.stdout}\n"
+            if result.stderr:
+                res += f"STDERR:\n{result.stderr}\n"
+            if len(result.stdout) == 0 and len(result.stderr) == 0:
                 res += "No output produced."
             return res
         except Exception as e:
@@ -127,18 +127,19 @@ class FileOperationToolkit(ToolKit):
         """Register enabled functions with the global registry"""
 
         if self.enable_read:
-            schema_get_file_content = types.FunctionDeclaration(
+            schema_get_file_content = FunctionDeclaration(
                 name="get_file_content",
                 description="Read the contents of a file and return them. Returns the full file content on success.",
-                parameters=types.Schema(
-                    type=types.Type.OBJECT,
-                    properties={
-                        "file_path": types.Schema(
-                            type=types.Type.STRING,
-                            description="path for file to be read",
-                        )
+                parameters={
+                    "type": "object",
+                    "properties": {
+                        "file_path": {
+                            "type": "string",
+                            "description": "path for file to be read",
+                        }
                     },
-                ),
+                    "required": ["file_path"],
+                },
             )
             self.schemas.append(schema_get_file_content)
             ToolKitRegistery.register(
@@ -146,18 +147,18 @@ class FileOperationToolkit(ToolKit):
             )
 
         if self.enable_list:
-            schema_get_files_info = types.FunctionDeclaration(
+            schema_get_files_info = FunctionDeclaration(
                 name="get_files_info",
                 description="List files and directories with metadata. The directory to list files from, relative to the working directory. If not provided, lists files in the working directory itself.",
-                parameters=types.Schema(
-                    type=types.Type.OBJECT,
-                    properties={
-                        "directory": types.Schema(
-                            type=types.Type.STRING,
-                            description="Directory to list the files for",
-                        )
+                parameters={
+                    "type": "object",
+                    "properties": {
+                        "directory": {
+                            "type": "string",
+                            "description": "Directory to list the files for",
+                        }
                     },
-                ),
+                },
             )
             self.schemas.append(schema_get_files_info)
             ToolKitRegistery.register(
@@ -165,45 +166,46 @@ class FileOperationToolkit(ToolKit):
             )
 
         if self.enable_write:
-            schema_write_file = types.FunctionDeclaration(
+            schema_write_file = FunctionDeclaration(
                 name="write_file",
                 description="function to write content to a certain a file, if file doesn't exist it creates it!",
-                parameters=types.Schema(
-                    type=types.Type.OBJECT,
-                    properties={
-                        "file_path": types.Schema(
-                            type=types.Type.STRING,
-                            description="path to the file to be operated on",
-                        ),
-                        "content": types.Schema(
-                            type=types.Type.STRING,
-                            description="Content to be written in the file",
-                        ),
+                parameters={
+                    "type": "object",
+                    "properties": {
+                        "file_path": {
+                            "type": "string",
+                            "description": "path to the file to be operated on",
+                        },
+                        "content": {
+                            "type": "string",
+                            "description": "Content to be written in the file",
+                        },
                     },
-                ),
+                    "required": ["file_path", "content"],
+                },
             )
             self.schemas.append(schema_write_file)
             ToolKitRegistery.register("write_file", self._write_file, schema_write_file)
 
         if self.enable_execute:
-            schema_run_python_file = types.FunctionDeclaration(
+            schema_run_python_file = FunctionDeclaration(
                 name="run_python_file",
                 description="Execute a Python file located in the calculator directory. Returns the program output or an error.",
-                parameters=types.Schema(
-                    type=types.Type.OBJECT,
-                    properties={
-                        "file_path": types.Schema(
-                            type=types.Type.STRING,
-                            description="Relative path to the Python file to execute.",
-                        ),
-                        "args": types.Schema(
-                            type=types.Type.ARRAY,
-                            items=types.Schema(type=types.Type.STRING),
-                            description="Command-line arguments to pass to the Python file.",
-                        ),
+                parameters={
+                    "type": "object",
+                    "properties": {
+                        "file_path": {
+                            "type": "string",
+                            "description": "Relative path to the Python file to execute.",
+                        },
+                        "args": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "Command-line arguments to pass to the Python file.",
+                        },
                     },
-                    required=["file_path"],
-                ),
+                    "required": ["file_path"],
+                },
             )
             self.schemas.append(schema_run_python_file)
             ToolKitRegistery.register(
@@ -211,6 +213,6 @@ class FileOperationToolkit(ToolKit):
             )
 
     @property
-    def tool(self) -> types.Tool:
+    def tool(self) -> Tool:
         """Get the Tool instance for this toolkit"""
-        return types.Tool(function_declarations=self.schemas)
+        return Tool(function_declarations=self.schemas)

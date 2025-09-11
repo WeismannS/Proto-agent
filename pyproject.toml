@@ -6,7 +6,9 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "click>=8.2.1",
-    "google-genai[typing,typings]==1.12.1",
+    "google>=3.0.0",
+    "google-genai>=1.36.0",
+    "litellm>=1.52.0",
     "psutil>=6.0.0",
     "python-dotenv==1.1.0",
 ]

@@ -1,13 +1,13 @@
-from google.genai import types
+from types_llm import FunctionDeclaration
 from typing import Callable
 
 
 class ToolKitRegistery:
     _functions: dict[str, Callable] = {}
-    _schemas: list[types.FunctionDeclaration] = []
+    _schemas: list[FunctionDeclaration] = []
 
     @classmethod
-    def register(cls, name: str, function: Callable, schema: types.FunctionDeclaration):
+    def register(cls, name: str, function: Callable, schema: FunctionDeclaration):
         if name in cls._functions:
             raise ValueError(f"Function '{name}' is already registered.")
         cls._functions[name] = function

@@ -31,9 +31,11 @@ def main_cli(
     read_only: bool,
     no_system: bool,
 ):
-    api_key = os.environ.get("GEMINI_API_KEY")
+    api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("API_KEY")
     if api_key is None:
-        raise Exception("Please provide an api key in your .env")
+        raise Exception(
+            "Please provide an api key in your .env as GEMINI_API_KEY or API_KEY"
+        )
 
     tools = []
 

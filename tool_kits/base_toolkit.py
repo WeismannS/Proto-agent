@@ -4,7 +4,7 @@ Provides common interface and functionality for all toolkits.
 """
 
 from abc import ABC, abstractmethod
-from google.genai import types
+from types_llm import Tool
 
 
 class ToolKit(ABC):
@@ -21,7 +21,7 @@ class ToolKit(ABC):
 
     @property
     @abstractmethod
-    def tool(self) -> types.Tool:
+    def tool(self) -> Tool:
         """Get the Tool instance for this toolkit. Must be implemented by subclasses."""
         pass
 
