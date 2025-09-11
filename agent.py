@@ -4,16 +4,7 @@ from google.genai import types, Client
 from Config import SYSTEM_PROMPT
 from agent_settings import AgentConfig
 from functions.run_python_file import run_python_file
-from functions.get_file_content import get_file_content
-from functions.get_files_info import get_files_info
-from functions.write_file import write_file
-
-FUNCTIONS_TABLE = {
-    "get_file_content": get_file_content,
-    "get_files_info": get_files_info,
-    "write_file": write_file,
-    "run_python_file": run_python_file,
-}
+from tool_kit_registry import ToolKitRegistery
 
 
 def _create_error_response(function_name: str, error: str):
@@ -49,7 +40,7 @@ class Agent:
             return _create_error_response(
                 "Invalid function", f"Unknown function: {function_call_part.name}"
             )
-        function_to_run = FUNCTIONS_TABLE.get(function_call_part.name)
+        function_to_run = ToolKitRegistery.get_function(function_call_part.name)
         if function_to_run is None:
             return _create_error_response(
                 "Invalid function", f"Unknown function: {function_call_part.name}"
@@ -71,7 +62,9 @@ class Agent:
                     function_call_part.name, f"Refused to run {function_call_part.name}"
                 )
         args_dict = (function_call_part.args) if function_call_part.args else {}
-        res = function_to_run(self.settings.working_directory, **args_dict)
+        res = function_to_run(
+            working_directory=self.settings.working_directory, **args_dict
+        )
         return types.Content(
             role="tool",
             parts=[
