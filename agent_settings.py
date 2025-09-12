@@ -14,6 +14,7 @@ class AgentConfig:
         tools: list[Tool] = [],
         verbose: bool = False,
         allow_exec: bool = False,
+        permission_required: set = set(),
     ):
         self.api_key = api_key
         self.working_directory = working_directory
@@ -22,6 +23,7 @@ class AgentConfig:
         self.tools: list[Tool] = tools
         self.verbose = verbose
         self.allow_exec = allow_exec
+        self.permission_required = permission_required
         if not isinstance(self.working_directory, Path):
             self.working_directory = Path(self.working_directory)
         self.working_directory = self.working_directory.resolve()

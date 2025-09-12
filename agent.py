@@ -5,6 +5,7 @@ import json
 from Config import SYSTEM_PROMPT
 from agent_settings import AgentConfig
 from tool_kit_registry import ToolKitRegistery
+import time
 from types_llm import (
     Content,
     Part,
@@ -26,11 +27,11 @@ def _create_error_response(function_name: str, error: str):
     )
 
 
-def _get_user_confirmation(file_path: str, args: dict) -> bool:
-    """Get user confirmation for file execution."""
+def _get_user_confirmation(function_name: str, args: dict) -> bool:
+    """Get user confirmation for function execution."""
     args_display = {k: v for k, v in args.items() if k != "file_path"}
     choice = input(
-        f"Allow execution of '{file_path}' with args {args_display}? (y/N): "
+        f"Allow execution of function '{function_name}' with args {args_display}? (y/N): "
     ).lower()
     return choice in ("y", "yes")
 
@@ -127,9 +128,14 @@ class Agent:
 
         return litellm_tools
 
-    def call_function(
-        self, function_call_part: FunctionCall, verbose=False, allow_exec=False
-    ):
+    def clear_messages(self):
+        """Clear the message history"""
+        self._litellm_messages = []
+        self._last_tool_call_ids = []
+        if SYSTEM_PROMPT:
+            self._litellm_messages.append({"role": "system", "content": SYSTEM_PROMPT})
+
+    def call_function(self, function_call_part: FunctionCall, verbose=False):
         if function_call_part.name is None:
             return _create_error_response(
                 "Invalid function", f"Unknown function: {function_call_part.name}"
@@ -145,15 +151,13 @@ class Agent:
             )
         else:
             print(f" - Calling function: {function_call_part.name}")
-        if function_to_run.__name__ == "run_python_file" and not allow_exec:
-            function_arguments = (
-                function_call_part.args if function_call_part.args else {}
-            )
-            file_path = function_arguments.get("file_path", "")
-
-            if not _get_user_confirmation(file_path, function_arguments):
+        print(function_call_part.name, self.settings.permission_required)
+        if function_call_part.name in self.settings.permission_required:
+            if not _get_user_confirmation(
+                function_call_part.name, function_call_part.args or {}
+            ):
                 return _create_error_response(
-                    function_call_part.name, f"Refused to run {function_call_part.name}"
+                    function_call_part.name, "User Refused to run function"
                 )
         args_dict = (function_call_part.args) if function_call_part.args else {}
         res = function_to_run(
@@ -188,6 +192,7 @@ class Agent:
 
         while iterations < self.settings.max_iterations:
             try:
+                start_time = time.time()
                 response = completion(
                     api_key=self.settings.api_key,
                     model=self.settings.model,
@@ -195,6 +200,11 @@ class Agent:
                     tools=self._litellm_tools,
                     temperature=1.0,
                 )
+                end_time = time.time()
+                if self.settings.verbose:
+                    print(
+                        f"LiteLLM completion took {end_time - start_time:.2f} seconds"
+                    )
                 choices = getattr(response, "choices", [])
                 if not choices:
                     raise Exception("No choices returned from LiteLLM")
@@ -273,7 +283,7 @@ class Agent:
                 function_response_parts = []
                 for function_call in function_calls:
                     function_res = self.call_function(
-                        function_call, self.settings.verbose, self.settings.allow_exec
+                        function_call, self.settings.verbose
                     )
 
                     if (

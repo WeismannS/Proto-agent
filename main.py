@@ -65,8 +65,8 @@ def main_cli(
         api_key=api_key,
         working_directory=working_directory,
         tools=tools,
-        allow_exec=allow_exec,
         verbose=verbose,
+        permission_required={FileOperationToolkit.RUN_PYTHON_FILE},
     )
 
     agent = Agent(configuration)
