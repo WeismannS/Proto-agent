@@ -16,6 +16,9 @@ dependencies = [
 [project.scripts]
 proto-agent = "proto_agent.main:main_cli"
 
+[tool.uv]
+package = true
+
 [tool.setuptools.packages.find]
 exclude = ["docs*"]
 
