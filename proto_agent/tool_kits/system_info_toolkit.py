@@ -239,6 +239,13 @@ schema_list_processes = FunctionDeclaration(
 class SystemInfoToolkit(ToolKit):
     """System information toolkit providing system monitoring capabilities"""
 
+    GET_SYSTEM_INFO = "get_system_info"
+    GET_MEMORY_USAGE = "get_memory_usage"
+    GET_DISK_USAGE = "get_disk_usage"
+    GET_CPU_INFO = "get_cpu_info"
+    GET_NETWORK_INFO = "get_network_info"
+    LIST_PROCESSES = "list_processes"
+
     def __init__(
         self,
         enable_basic: bool = True,
@@ -247,6 +254,7 @@ class SystemInfoToolkit(ToolKit):
         enable_cpu: bool = True,
         enable_network: bool = True,
         enable_processes: bool = True,
+        requires_permissions: set | None = None,
     ):
         """
         Initialize SystemInfoToolkit with capability flags.
@@ -266,12 +274,12 @@ class SystemInfoToolkit(ToolKit):
         self.enable_cpu = enable_cpu
         self.enable_network = enable_network
         self.enable_processes = enable_processes
+        self.requires_permissions = requires_permissions or set()
         self._register_functions()
 
     def _register_functions(self):
         """Register system information functions with the global registry based on enabled capabilities"""
 
-        # Then register our system info functions
         if self.enable_basic:
             self.schemas.append(schema_get_system_info)
             ToolKitRegistery.register(
