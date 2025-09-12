@@ -22,4 +22,5 @@ exclude = ["docs*"]
 [dependency-groups]
 dev = [
     "ruff>=0.12.12",
+    "pytest>=8.0.0",
 ]
