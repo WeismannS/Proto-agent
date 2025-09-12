@@ -1,4 +1,3 @@
-
 # Proto-Agent
 
 > **A modular AI agent with capability-based security and extensible toolkit architecture.**
@@ -20,19 +19,23 @@ Proto-Agent is a Python-based AI agent that demonstrates modern LLM function cal
 ## 📦 Available Toolkits
 
 ### 📁 FileOperationToolkit
+
 Complete file system operations with boundary protection:
-- **Read operations**: `get_file_content`, `get_files_info`  
+
+- **Read operations**: `get_file_content`, `get_files_info`
 - **Write operations**: `write_file` with safety validation
 - **Code execution**: `run_python_file` with user confirmation
 - **Capability flags**: `enable_read`, `enable_write`, `enable_list`, `enable_execute`
 
-### 💻 SystemInfoToolkit  
+### 💻 SystemInfoToolkit
+
 Comprehensive system monitoring and hardware information:
+
 - **Basic info**: Platform, architecture, Python version
 - **Memory monitoring**: Virtual and swap memory usage
 - **Disk usage**: Storage statistics and partition information
 - **CPU metrics**: Core count, frequency, real-time usage
-- **Network info**: Interface details and I/O statistics  
+- **Network info**: Interface details and I/O statistics
 - **Process listing**: Running processes with resource usage
 - **Capability flags**: `enable_basic`, `enable_memory`, `enable_disk`, `enable_cpu`, `enable_network`, `enable_processes`
 
@@ -48,22 +51,25 @@ Comprehensive system monitoring and hardware information:
 ## 📦 Quick Start
 
 ### Prerequisites
+
 - Python 3.11 or higher
 - Google Gemini API key ([Get one here](https://aistudio.google.com/app/apikey))
 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/WeismannS/Proto-agent.git
    cd Proto-agent
    ```
 
 2. **Install dependencies**
+
    ```bash
    # Using uv (recommended)
    uv pip install -e .
-   
+
    # Or using pip
    pip install -e .
    ```
@@ -75,27 +81,100 @@ Comprehensive system monitoring and hardware information:
 
 ### Usage Examples
 
+#### CLI Usage
+
 **Basic file operations:**
+
 ```bash
-python main.py "List all files in the current directory"
+python -m proto_agent "List all files in the current directory"
 ```
 
 **Read-only mode (safe exploration):**
+
+```bash
+python -m proto_agent "Analyze the codebase structure" --read-only
+```
+
+**System monitoring:**
+
+```bash
+python -m proto_agent "Show me system performance metrics" --verbose
+```
+
+**Disable system access:**
+
+```bash
+python -m proto_agent "Help me organize these files" --no-system
+```
+
+**Allow code execution:**
+
+```bash
+python -m proto_agent "Run the calculator tests and fix any issues" --allow-exec
+```
+
+#### Library Usage
+
+Proto-Agent can also be used as a Python library for programmatic access:
+
+```python
+from proto_agent import create_agent, Agent, AgentConfig
+
+# Simple usage with helper function
+agent = create_agent(
+    api_key="your_gemini_api_key",
+    working_directory="./my_project",
+    read_only=True,
+    verbose=True
+)
+
+response = agent.generate_content("Analyze this codebase")
+print(response.text)
+
+# Advanced usage with direct Agent instantiation
+config = AgentConfig(
+    api_key="your_gemini_api_key",
+    working_directory="./my_project",
+    model="gemini/gemini-2.0-flash-001",
+    max_iterations=20,
+    verbose=True,
+    allow_exec=False
+)
+
+agent = Agent(config)
+response = agent.generate_content("List all Python files")
+print(response.text)
+```
+
+**Library Options:**
+
+- `api_key`: Your Gemini API key (required)
+- `working_directory`: Directory for operations (default: "./calculator")
+- `verbose`: Enable detailed logging (default: False)
+- `allow_exec`: Allow code execution without prompting (default: False)
+- `read_only`: Enable only read operations (default: False)
+- `no_system`: Disable system monitoring (default: False)
+
+**Read-only mode (safe exploration):**
+
 ```bash
 python main.py "Analyze the codebase structure" --read-only
 ```
 
 **System monitoring:**
+
 ```bash
 python main.py "Show me system performance metrics" --verbose
 ```
 
 **Disable system access:**
+
 ```bash
 python main.py "Help me organize these files" --no-system
 ```
 
 **Allow code execution:**
+
 ```bash
 python main.py "Run the calculator tests and fix any issues" --allow-exec
 ```
@@ -135,7 +214,7 @@ file_toolkit = FileOperationToolkit(
     enable_execute=False
 )
 
-# Limited system monitoring  
+# Limited system monitoring
 system_toolkit = SystemInfoToolkit(
     enable_basic=True,
     enable_memory=True,
@@ -159,6 +238,7 @@ system_toolkit = SystemInfoToolkit(
 ## 🛡️ Security Features
 
 ### Multi-Layer Protection
+
 - **Capability Flags**: Functions only available if explicitly enabled
 - **Boundary Checking**: All file operations restricted to working directory
 - **User Confirmation**: Interactive prompts for code execution
@@ -167,14 +247,15 @@ system_toolkit = SystemInfoToolkit(
 - **Execution Limits**: 30-second timeout on subprocess operations
 
 ### Permission Levels
-| Permission Level | Operations | Risk Level |
-|-----------------|------------|------------|
-| **Read-only** | File reading, directory listing | 🟢 Safe |
-| **Write** | File creation/modification | 🟡 Moderate |
-| **Execute** | Python script execution | 🔴 **Requires Approval** |
-| **System** | Hardware monitoring | � Moderate |
-| **Network** | Interface information | 🟡 Moderate |
-| **Processes** | Process listing | 🟡 Moderate |
+
+| Permission Level | Operations                      | Risk Level               |
+| ---------------- | ------------------------------- | ------------------------ |
+| **Read-only**    | File reading, directory listing | 🟢 Safe                  |
+| **Write**        | File creation/modification      | 🟡 Moderate              |
+| **Execute**      | Python script execution         | 🔴 **Requires Approval** |
+| **System**       | Hardware monitoring             | � Moderate               |
+| **Network**      | Interface information           | 🟡 Moderate              |
+| **Processes**    | Process listing                 | 🟡 Moderate              |
 
 ## 🔧 CLI Reference
 
@@ -184,7 +265,7 @@ python main.py "Your prompt here" [OPTIONS]
 Options:
   --working-directory TEXT    Directory for agent operations (default: ./calculator)
   -v, --verbose              Enable detailed logging
-  -a, --allow-exec           Allow code execution without prompting  
+  -a, --allow-exec           Allow code execution without prompting
   --read-only               Enable only read operations (no write/execute)
   --no-system               Disable system monitoring capabilities
   --help                    Show this message and exit
@@ -193,21 +274,25 @@ Options:
 ### Usage Patterns
 
 **Safe exploration:**
+
 ```bash
 python main.py "What files are in this project?" --read-only
 ```
 
 **Development workflow:**
+
 ```bash
 python main.py "Analyze the code, run tests, and suggest improvements" --allow-exec -v
 ```
 
 **System administration:**
+
 ```bash
 python main.py "Check system resources and running processes" --verbose
 ```
 
 **Restricted environment:**
+
 ```bash
 python main.py "Help organize these files" --read-only --no-system
 ```
@@ -293,26 +378,31 @@ tools.append(custom_toolkit.tool)
 ## 📚 Examples & Use Cases
 
 ### Example 1: Code Analysis & Testing
+
 ```bash
 python main.py "Read all Python files, analyze the code quality, and run any available tests" --allow-exec --verbose
 ```
 
 ### Example 2: System Health Check
+
 ```bash
 python main.py "Give me a comprehensive system health report including CPU, memory, and disk usage"
 ```
 
 ### Example 3: Safe File Organization
+
 ```bash
 python main.py "Analyze the file structure and suggest an organization strategy" --read-only
 ```
 
 ### Example 4: Development Workflow
+
 ```bash
 python main.py "Review the calculator code, identify any bugs, fix them, and verify with tests" --allow-exec
 ```
 
 ### Example 5: Documentation Generation
+
 ```bash
 python main.py "Read all source files and create comprehensive documentation" --read-only --verbose
 ```
@@ -351,9 +441,11 @@ MIT License - feel free to use this code for your own projects.
 - Click framework for professional CLI interface
 - Inspired by modern AI agent architectures and security patterns
 - Boot.dev for the ai agent course which inspired this project
+
 ## ⭐ Why This Matters
 
 Proto-Agent demonstrates how to build **well-architected AI agents** with:
+
 - **Granular control** over AI capabilities through permission flags
 - **Professional code organization** with modular, extensible design
 - **Educational clarity** for understanding modern AI agent patterns
