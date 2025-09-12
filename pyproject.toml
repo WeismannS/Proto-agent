@@ -1,7 +1,7 @@
 [project]
-name = "ai-agent"
+name = "proto-agent"
 version = "0.1.0"
-description = "Add your description here"
+description = "A modular AI agent."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -12,6 +12,12 @@ dependencies = [
     "psutil>=6.0.0",
     "python-dotenv==1.1.0",
 ]
+
+[project.scripts]
+proto-agent = "proto_agent.main:main_cli"
+
+[tool.setuptools.packages.find]
+exclude = ["docs*"]
 
 [dependency-groups]
 dev = [
