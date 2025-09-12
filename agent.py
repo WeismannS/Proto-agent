@@ -40,15 +40,12 @@ class Agent:
         self.settings = settings
         self._last_tool_call_ids = []
 
-        # Pre-convert tools once during initialization
         self._litellm_tools = None
         if self.settings.tools:
             self._litellm_tools = self._convert_tools_to_litellm(self.settings.tools)
 
-        # Maintain LiteLLM message history to avoid re-converting everything
         self._litellm_messages = []
 
-        # Add system message once at initialization
         if SYSTEM_PROMPT:
             self._litellm_messages.append({"role": "system", "content": SYSTEM_PROMPT})
 
@@ -57,7 +54,6 @@ class Agent:
         messages = []
 
         if content.role == "user":
-            # Convert user messages
             content_parts = []
             for part in content.parts:
                 if part.text:
@@ -71,11 +67,9 @@ class Agent:
             text_parts = [part.text for part in content.parts if part.text]
 
             if has_function_calls:
-                # Create tool calls for LiteLLM using stored IDs
                 tool_calls = []
                 for i, part in enumerate(content.parts):
                     if part.function_call:
-                        # Use stored tool call ID if available, otherwise generate one
                         tool_call_id = self._last_tool_call_ids[i]
                         tool_calls.append(
                             {
@@ -103,11 +97,7 @@ class Agent:
             # Convert tool responses and use the stored tool call IDs
             for i, part in enumerate(content.parts):
                 if part.function_response:
-                    tool_call_id = (
-                        self._last_tool_call_ids[i]
-                        if i < len(self._last_tool_call_ids)
-                        else f"call_{i}"
-                    )
+                    tool_call_id = self._last_tool_call_ids[i]
                     messages.append(
                         {
                             "role": "tool",
@@ -214,7 +204,6 @@ class Agent:
                     raise Exception("No message in response choice")
 
                 response_text = getattr(message, "content", "")
-                print("-----> ", response_text)
 
                 # Check for tool calls
                 tool_calls = getattr(message, "tool_calls", None)
