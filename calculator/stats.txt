@@ -1,0 +1,13 @@
+{
+  "virtual_memory": {
+    "total": "15.53 GB",
+    "available": "11.97 GB",
+    "used": "3.33 GB",
+    "percentage": "23.0%"
+  },
+  "swap_memory": {
+    "total": "4.00 GB",
+    "used": "0.00 GB",
+    "percentage": "0.0%"
+  }
+}

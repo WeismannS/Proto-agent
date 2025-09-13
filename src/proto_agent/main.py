@@ -4,9 +4,17 @@ from .agent_settings import AgentConfig
 from .agent import Agent
 import click
 from .tool_kits import FileOperationToolkit, SystemInfoToolkit
+import tomllib, tomli_w
+from pathlib import Path
+from platformdirs import user_config_dir
 
 
-@click.command()
+
+@click.command(help=f"""Main CLI entry point for the Proto Agent 
+    Sets up the agent with specified toolkits and configurations, then processes the user prompt.
+    Configuration and API key are loaded from a user-specific config directory 
+    {str(Path(user_config_dir("proto-agent")))}
+    """)
 @click.argument("prompt")
 @click.option(
     "--working-directory",
@@ -14,9 +22,6 @@ from .tool_kits import FileOperationToolkit, SystemInfoToolkit
     help="The directory the agent can operate in",
 )
 @click.option("-v", "--verbose", is_flag=True, help="Enable detailed logging")
-@click.option(
-    "-a", "--allow-exec", is_flag=True, help="Allow code execution without prompting"
-)
 @click.option(
     "--read-only", is_flag=True, help="Enable only read operations (no write/execute)"
 )
@@ -27,16 +32,27 @@ def main_cli(
     prompt: str,
     working_directory: str,
     verbose: bool,
-    allow_exec: bool,
     read_only: bool,
     no_system: bool,
 ):
+    config_dir = Path(user_config_dir("proto-agent"))
+    config_dir.mkdir(parents=True, exist_ok=True)
+    config_file = config_dir / "config.toml"
+    env_file = config_dir / ".env"
+    if not env_file.exists():
+        with env_file.open("wb") as f:
+            f.write(b"# Add your GEMINI_API_KEY or API_KEY here\n")
+    if not config_file.exists():
+        default_config = {"model": "gemini/gemini-2.0-flash-001"}
+        with config_file.open("wb") as f:
+            tomli_w.dump(default_config, f)
+    load_dotenv(dotenv_path=str(env_file.resolve()))
     api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("API_KEY")
     if api_key is None:
         raise Exception(
             "Please provide an api key in your .env as GEMINI_API_KEY or API_KEY"
         )
-
+    config = tomllib.loads(config_file.read_text())
     tools = []
     if read_only:
         file_toolkit = FileOperationToolkit(
@@ -62,6 +78,7 @@ def main_cli(
 
     configuration = AgentConfig(
         api_key=api_key,
+        model=config.get("model", "gemini/gemini-2.0-flash-001"),
         working_directory=working_directory,
         tools=tools,
         verbose=verbose,
@@ -81,5 +98,6 @@ def main_cli(
 
 
 if __name__ == "__main__":
-    load_dotenv()
+    
+
     main_cli()

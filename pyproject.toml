@@ -1,6 +1,6 @@
 [project]
 name = "proto-agent"
-version = "0.1.0"
+version = "0.2.0"
 description = "A modular AI agent."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -9,8 +9,10 @@ dependencies = [
     "google>=3.0.0",
     "google-genai>=1.36.0",
     "litellm>=1.52.0",
+    "platformdirs>=4.4.0",
     "psutil>=6.0.0",
     "python-dotenv==1.1.0",
+    "tomli-w>=1.2.0",
 ]
 
 [project.scripts]
@@ -22,6 +24,7 @@ build-backend = "uv_build"
 
 [tool.setuptools.packages.find]
 exclude = ["docs*"]
+
 
 [dependency-groups]
 dev = [
