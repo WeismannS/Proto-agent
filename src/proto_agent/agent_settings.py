@@ -9,7 +9,7 @@ class AgentConfig:
         self,
         api_key: str,
         working_directory: Path | str,
-        model: str = "gemini/gemini-2.0-flash-001",
+        model: str,
         max_iterations: int = 20,
         tools: list[Tool] = [],
         verbose: bool = False,

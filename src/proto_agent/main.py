@@ -43,16 +43,16 @@ def main_cli(
     env_file = config_dir / ".env"
     if not env_file.exists():
         with env_file.open("wb") as f:
-            f.write(b"# Add your GEMINI_API_KEY or API_KEY here\n")
+            f.write(b"# Add your API_KEY here\n")
     if not config_file.exists():
         default_config = {"model": "gemini/gemini-2.0-flash-001"}
         with config_file.open("wb") as f:
             tomli_w.dump(default_config, f)
     load_dotenv(dotenv_path=str(env_file.resolve()))
-    api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("API_KEY")
+    api_key = os.environ.get("API_KEY")
     if api_key is None:
         raise Exception(
-            "Please provide an api key in your .env as GEMINI_API_KEY or API_KEY"
+            "Please provide an api key in your .env API_KEY"
         )
     config = tomllib.loads(config_file.read_text())
     tools = []
@@ -80,7 +80,7 @@ def main_cli(
 
     configuration = AgentConfig(
         api_key=api_key,
-        model=config.get("model", "gemini/gemini-2.0-flash-001"),
+        model=config.get("model", ""),
         working_directory=working_directory,
         tools=tools,
         verbose=verbose,
