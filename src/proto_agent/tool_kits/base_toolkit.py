@@ -4,7 +4,7 @@ Provides common interface and functionality for all toolkits.
 """
 
 from abc import ABC, abstractmethod
-from types_llm import Tool
+from ..types_llm import Tool
 
 
 class ToolKit(ABC):

@@ -1,9 +1,9 @@
 from dotenv import load_dotenv
 import os
-from agent_settings import AgentConfig
-from agent import Agent
+from .agent_settings import AgentConfig
+from .agent import Agent
 import click
-from tool_kits import FileOperationToolkit, SystemInfoToolkit
+from .tool_kits import FileOperationToolkit, SystemInfoToolkit
 
 
 @click.command()
@@ -38,7 +38,6 @@ def main_cli(
         )
 
     tools = []
-
     if read_only:
         file_toolkit = FileOperationToolkit(
             enable_read=True, enable_write=False, enable_list=True, enable_execute=False
@@ -70,6 +69,7 @@ def main_cli(
     )
 
     agent = Agent(configuration)
+
     response = agent.generate_content(prompt=prompt)
     if not response:
         return

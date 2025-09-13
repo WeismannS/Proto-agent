@@ -2,8 +2,8 @@ import psutil
 import platform
 import json
 from datetime import datetime
-from tool_kit_registry import ToolKitRegistery
-from types_llm import FunctionDeclaration, Tool
+from ..tool_kit_registry import ToolKitRegistery
+from ..types_llm import FunctionDeclaration, Tool
 
 from .base_toolkit import ToolKit
 

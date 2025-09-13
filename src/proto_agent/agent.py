@@ -1,12 +1,12 @@
 from typing import List
 from litellm import completion
 import json
-
-from Config import SYSTEM_PROMPT
-from agent_settings import AgentConfig
-from tool_kit_registry import ToolKitRegistery
 import time
-from types_llm import (
+
+from .Config import SYSTEM_PROMPT
+from .agent_settings import AgentConfig
+from .tool_kit_registry import ToolKitRegistery
+from .types_llm import (
     Content,
     Part,
     FunctionCall,

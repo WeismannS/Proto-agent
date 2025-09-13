@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
-from types_llm import Tool
+from .types_llm import Tool
 
 
 @dataclass

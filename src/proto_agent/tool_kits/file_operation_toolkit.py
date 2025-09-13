@@ -1,9 +1,9 @@
 from pathlib import Path
 from subprocess import run
-from tool_kit_registry import ToolKitRegistery
-from types_llm import FunctionDeclaration, Tool
+from ..tool_kit_registry import ToolKitRegistery
+from ..types_llm import FunctionDeclaration, Tool
 from .base_toolkit import ToolKit
-from Config import MAX_BYTES
+from ..Config import MAX_BYTES
 
 
 def _is_in_boundary(working_directory: Path, path: Path) -> bool:

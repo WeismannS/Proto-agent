@@ -1,4 +1,4 @@
-from types_llm import FunctionDeclaration
+from .types_llm import FunctionDeclaration
 from typing import Callable
 
 
