@@ -27,14 +27,6 @@ def _create_error_response(function_name: str, error: str):
     )
 
 
-def _get_user_confirmation(function_name: str, args: dict) -> bool:
-    """Get user confirmation for function execution."""
-    args_display = {k: v for k, v in args.items() if k != "file_path"}
-    choice = input(
-        f"Allow execution of function '{function_name}' with args {args_display}? (y/N): "
-    ).lower()
-    return choice in ("y", "yes")
-
 
 class Agent:
     def __init__(self, settings: AgentConfig):
@@ -152,8 +144,8 @@ class Agent:
         else:
             print(f" - Calling function: {function_call_part.name}")
         print(function_call_part.name, self.settings.permission_required)
-        if function_call_part.name in self.settings.permission_required:
-            if not _get_user_confirmation(
+        if function_call_part.name in self.settings.permission_required and self.settings.permission_callback:
+            if not self.settings.permission_callback(
                 function_call_part.name, function_call_part.args or {}
             ):
                 return _create_error_response(

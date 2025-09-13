@@ -9,6 +9,13 @@ import tomli_w
 from pathlib import Path
 from platformdirs import user_config_dir
 
+def _get_user_confirmation(function_name: str, args: dict) -> bool:
+    """Get user confirmation for function execution."""
+    args_display = {k: v for k, v in args.items() if k != "file_path"}
+    choice = input(
+        f"Allow execution of function '{function_name}' with args {args_display}? (y/N): "
+    ).lower()
+    return choice in ("y", "yes")
 
 @click.command(
     help=f"""Main CLI entry point for the Proto Agent 
@@ -82,6 +89,7 @@ def main_cli(
         working_directory=working_directory,
         tools=tools,
         verbose=verbose,
+        permission_callback=_get_user_confirmation,
         permission_required={FileOperationToolkit.RUN_PYTHON_FILE},
     )
 
