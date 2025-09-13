@@ -4,17 +4,19 @@ from .agent_settings import AgentConfig
 from .agent import Agent
 import click
 from .tool_kits import FileOperationToolkit, SystemInfoToolkit
-import tomllib, tomli_w
+import tomllib
+import tomli_w
 from pathlib import Path
 from platformdirs import user_config_dir
 
 
-
-@click.command(help=f"""Main CLI entry point for the Proto Agent 
+@click.command(
+    help=f"""Main CLI entry point for the Proto Agent 
     Sets up the agent with specified toolkits and configurations, then processes the user prompt.
     Configuration and API key are loaded from a user-specific config directory 
     {str(Path(user_config_dir("proto-agent")))}
-    """)
+    """
+)
 @click.argument("prompt")
 @click.option(
     "--working-directory",
@@ -98,6 +100,4 @@ def main_cli(
 
 
 if __name__ == "__main__":
-    
-
     main_cli()

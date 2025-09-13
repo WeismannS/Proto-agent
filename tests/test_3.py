@@ -14,7 +14,7 @@ class TestCLI(unittest.TestCase):
                 capture_output=True,
                 text=True,
                 timeout=10,
-                cwd=os.path.dirname(os.path.dirname(__file__))
+                cwd=os.path.dirname(os.path.dirname(__file__)),
             )
             self.assertEqual(result.returncode, 0)
             self.assertIn("Usage:", result.stdout)
@@ -28,7 +28,7 @@ class TestCLI(unittest.TestCase):
                 capture_output=True,
                 text=True,
                 timeout=10,
-                cwd=os.path.dirname(os.path.dirname(__file__))
+                cwd=os.path.dirname(os.path.dirname(__file__)),
             )
             self.assertEqual(result.returncode, 0)
             self.assertIn("--working-directory", result.stdout)

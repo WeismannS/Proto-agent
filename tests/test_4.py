@@ -1,6 +1,5 @@
 import unittest
 import tempfile
-import os
 from proto_agent.tool_kits import FileOperationToolkit, SystemInfoToolkit
 from proto_agent.tool_kit_registry import ToolKitRegistery
 
@@ -23,7 +22,7 @@ class TestToolkits(unittest.TestCase):
         self.assertGreater(len(toolkit.schemas), 0)
 
     def test_toolkit_functionality(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory():
             toolkit = FileOperationToolkit()
             self.assertIsNotNone(toolkit.tool)
             self.assertGreater(len(toolkit.tool.function_declarations), 0)
