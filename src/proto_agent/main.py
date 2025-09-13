@@ -51,9 +51,7 @@ def main_cli(
     load_dotenv(dotenv_path=str(env_file.resolve()))
     api_key = os.environ.get("API_KEY")
     if api_key is None:
-        raise Exception(
-            "Please provide an api key in your .env API_KEY"
-        )
+        raise Exception("Please provide an api key in your .env API_KEY")
     config = tomllib.loads(config_file.read_text())
     tools = []
     if read_only:
