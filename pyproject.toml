@@ -16,8 +16,9 @@ dependencies = [
 [project.scripts]
 proto-agent = "proto_agent.main:main_cli"
 
-[tool.uv]
-package = true
+[build-system]
+requires = ["uv_build >= 0.7.19, <0.9.0"]
+build-backend = "uv_build"
 
 [tool.setuptools.packages.find]
 exclude = ["docs*"]
