@@ -3,7 +3,7 @@ name = "proto-agent"
 version = "0.1.0"
 description = "A modular AI agent."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 dependencies = [
     "click>=8.2.1",
     "google>=3.0.0",
