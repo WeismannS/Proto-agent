@@ -10,7 +10,7 @@ class TestCLI(unittest.TestCase):
     def test_cli_help(self):
         try:
             result = subprocess.run(
-                [sys.executable, "-m", "proto_agent", "--help"],
+                [sys.executable, "-m", "proto_agent.main", "--help"],
                 capture_output=True,
                 text=True,
                 timeout=10,
@@ -24,7 +24,7 @@ class TestCLI(unittest.TestCase):
     def test_cli_functioanlity(self):
         try:
             result = subprocess.run(
-                [sys.executable, "-m", "proto_agent", "--help"],
+                [sys.executable, "-m", "proto_agent.main", "--help"],
                 capture_output=True,
                 text=True,
                 timeout=10,
