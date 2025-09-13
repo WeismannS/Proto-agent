@@ -27,7 +27,6 @@ def _create_error_response(function_name: str, error: str):
     )
 
 
-
 class Agent:
     def __init__(self, settings: AgentConfig):
         self.settings = settings
@@ -144,7 +143,10 @@ class Agent:
         else:
             print(f" - Calling function: {function_call_part.name}")
         print(function_call_part.name, self.settings.permission_required)
-        if function_call_part.name in self.settings.permission_required and self.settings.permission_callback:
+        if (
+            function_call_part.name in self.settings.permission_required
+            and self.settings.permission_callback
+        ):
             if not self.settings.permission_callback(
                 function_call_part.name, function_call_part.args or {}
             ):
