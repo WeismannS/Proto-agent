@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
+
+from proto_agent.Config import SYSTEM_PROMPT
 from .types_llm import Tool
 
 
@@ -16,7 +18,9 @@ class AgentConfig:
         verbose: bool = False,
         permission_callback: Callable[[str, dict], bool] | None = None,
         permission_required: set = set(),
+        system_prompt: str = SYSTEM_PROMPT,
     ):
+        self.system_prompt = system_prompt
         self.api_key = api_key
         self.working_directory = working_directory
         self.model = model

@@ -37,9 +37,9 @@ class Agent:
             self._litellm_tools = self._convert_tools_to_litellm(self.settings.tools)
 
         self._litellm_messages = []
-
-        if SYSTEM_PROMPT:
-            self._litellm_messages.append({"role": "system", "content": SYSTEM_PROMPT})
+        self._litellm_messages.append(
+            {"role": "system", "content": self.settings.system_prompt}
+        )
 
     def _convert_content_to_litellm_message(self, content: Content) -> List[dict]:
         """Convert a single Content message to LiteLLM format"""

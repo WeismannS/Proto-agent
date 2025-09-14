@@ -1,5 +1,7 @@
 from dotenv import load_dotenv
 import os
+
+from proto_agent.Config import SYSTEM_PROMPT
 from .agent_settings import AgentConfig
 from .agent import Agent
 import click
@@ -111,7 +113,7 @@ def main_cli(
                 enable_history=True,
             )
         tools.append(git_toolkit.tool)
-
+    print(config)
     configuration = AgentConfig(
         api_key=api_key,
         model=config.get("model", ""),
@@ -125,6 +127,7 @@ def main_cli(
             GitToolkit.GIT_PUSH,
             GitToolkit.GIT_BRANCH,
         },
+        system_prompt=config.get(("system_prompt"), SYSTEM_PROMPT),
     )
 
     agent = Agent(configuration)
