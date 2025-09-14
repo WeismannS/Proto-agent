@@ -113,7 +113,6 @@ def main_cli(
                 enable_history=True,
             )
         tools.append(git_toolkit.tool)
-    print(config)
     configuration = AgentConfig(
         api_key=api_key,
         model=config.get("model", ""),

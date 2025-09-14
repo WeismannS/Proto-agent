@@ -1,6 +1,6 @@
 [project]
 name = "proto-agent"
-version = "0.6.0"
+version = "0.6.1"
 description = "A modular AI agent framework that can also be your local CLI agent!"
 readme = "README.md"
 requires-python = ">=3.10"
