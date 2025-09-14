@@ -3,7 +3,7 @@ import os
 from .agent_settings import AgentConfig
 from .agent import Agent
 import click
-from .tool_kits import FileOperationToolkit, SystemInfoToolkit
+from .tool_kits import FileOperationToolkit, SystemInfoToolkit, GitToolkit
 import tomllib
 import tomli_w
 from pathlib import Path
@@ -26,11 +26,11 @@ def _get_user_confirmation(function_name: str, args: dict) -> bool:
     {str(Path(user_config_dir("proto-agent")))}
     """
 )
-@click.argument("prompt")
-@click.option(
-    "--working-directory",
-    default="./calculator",
-    help="The directory the agent can operate in",
+@click.argument(
+    "prompt",
+)
+@click.argument(
+    "working-directory",
 )
 @click.option("-v", "--verbose", is_flag=True, help="Enable detailed logging")
 @click.option(
@@ -39,12 +39,20 @@ def _get_user_confirmation(function_name: str, args: dict) -> bool:
 @click.option(
     "--no-system", is_flag=True, help="Disable system monitoring capabilities"
 )
+@click.option("--enable-git", is_flag=True, help="Enable git operations toolkit")
+@click.option(
+    "--git-read-only",
+    is_flag=True,
+    help="Enable only git read operations (status, log, diff, blame)",
+)
 def main_cli(
     prompt: str,
     working_directory: str,
     verbose: bool,
     read_only: bool,
     no_system: bool,
+    enable_git: bool,
+    git_read_only: bool,
 ):
     config_dir = Path(user_config_dir("proto-agent"))
     config_dir.mkdir(parents=True, exist_ok=True)
@@ -85,6 +93,25 @@ def main_cli(
         )
         tools.append(system_toolkit.tool)
 
+    if enable_git:
+        if git_read_only:
+            git_toolkit = GitToolkit(
+                enable_read=True,
+                enable_write=False,
+                enable_branch=False,
+                enable_remote=False,
+                enable_history=True,
+            )
+        else:
+            git_toolkit = GitToolkit(
+                enable_read=True,
+                enable_write=True,
+                enable_branch=True,
+                enable_remote=True,
+                enable_history=True,
+            )
+        tools.append(git_toolkit.tool)
+
     configuration = AgentConfig(
         api_key=api_key,
         model=config.get("model", ""),
@@ -92,7 +119,12 @@ def main_cli(
         tools=tools,
         verbose=verbose,
         permission_callback=_get_user_confirmation,
-        permission_required={FileOperationToolkit.RUN_PYTHON_FILE},
+        permission_required={
+            FileOperationToolkit.RUN_PYTHON_FILE,
+            GitToolkit.GIT_COMMIT,
+            GitToolkit.GIT_PUSH,
+            GitToolkit.GIT_BRANCH,
+        },
     )
 
     agent = Agent(configuration)
