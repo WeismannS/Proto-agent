@@ -15,19 +15,17 @@ An educational AI agent framework demonstrating capability-based security and mo
 ### Installation
 
 ```bash
-pip install proto-agent
+pip install proto-agent # or if you prefer the cli to be used from anywhere: pip install --user proto-agent
 ```
 
 ### Configuration
 
-Add your Gemini API key to the config directory:
-
 ```bash
-# Linux/Mac: ~/.config/proto-agent/.env
-# Windows: %APPDATA%\proto-agent\.env
-echo "API_KEY=your_gemini_api_key_here" >> ~/.config/proto-agent/.env
+proto-agent --help # View CLI options, which include your config path for your OS 
+# Example config path for Linux: ~/.config/proto-agent/ will have .env file and config.toml 
 ```
 
+For Model configuration, please refer to the [Litellm documentation](https://docs.litellm.ai/docs/providers) for your exact name of the model you want to use.
 ### CLI Usage
 
 ```bash
@@ -47,7 +45,7 @@ from proto_agent.tool_kits import FileOperationToolkit
 
 # Autonomous mode - no human approval needed
 agent = Agent(AgentConfig(
-    api_key="your_gemini_api_key",
+    api_key="your_api_key",
     working_directory="./my_project",
     tools=[FileOperationToolkit(
         enable_read=True,

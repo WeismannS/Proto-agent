@@ -20,7 +20,7 @@ from proto_agent import Agent, AgentConfig
 from proto_agent.tool_kits import FileOperationToolkit
 
 agent = Agent(AgentConfig(
-    api_key="your_gemini_api_key",
+    api_key="your_api_key",
     working_directory="./my_project",
     tools=[FileOperationToolkit(enable_execute=False).tool]
 ))
@@ -78,7 +78,7 @@ Proto-Agent helps developers understand:
 ### Prerequisites
 
 - Python 3.11 or higher
-- Google Gemini API key ([Get one here](https://aistudio.google.com/app/apikey))
+- Your API key for your chosen LLM (e.g., Google Gemini, OpenAI)
 
 ### Installation
 
@@ -102,7 +102,7 @@ Proto-Agent uses a user-specific configuration directory for API keys and settin
 # ~/.config/proto-agent/.env
 
 # Add your API key
-echo "API_KEY=your_gemini_api_key_here" >> ~/.config/proto-agent/.env
+echo "API_KEY=your_api_key_here" >> ~/.config/proto-agent/.env
 ```
 
 ### CLI Usage (With Human Approval)
@@ -139,7 +139,7 @@ from proto_agent.tool_kits import FileOperationToolkit, SystemInfoToolkit
 
 # Option 1: No human approval - framework runs autonomously
 config = AgentConfig(
-    api_key="your_gemini_api_key",
+    api_key="your_api_key",
     working_directory="./my_project",
     tools=[
         FileOperationToolkit(
@@ -161,7 +161,7 @@ def custom_approval(function_name: str, args: dict) -> bool:
     return True  # Allow other operations
 
 config_with_custom_approval = AgentConfig(
-    api_key="your_gemini_api_key",
+    api_key="your_api_key",
     working_directory="./my_project",
     tools=[FileOperationToolkit().tool],
     permission_callback=custom_approval,

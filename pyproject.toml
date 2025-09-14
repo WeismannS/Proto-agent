@@ -1,7 +1,7 @@
 [project]
 name = "proto-agent"
-version = "0.5.0"
-description = "A modular AI agent."
+version = "0.5.1"
+description = "A modular AI agent framework that can also be your local CLI agent!"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -15,6 +15,29 @@ dependencies = [
     "tomli-w>=1.2.0",
 ]
 
+authors = [
+    { name = "WeismannS", email = "Sahazell@proton.me" }
+]
+
+license = { text = "MIT" }
+keywords = ["ai", "agent", "modular", "automation", "library", "framework", "CLI"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Utilities",
+]
+
+[project.urls]
+Homepage = "https://github.com/WeismannS/proto-agent"
+Repository = "https://github.com/WeismannS/proto-agent"
+Issues = "https://github.com/WeismannS/proto-agent/issues"
+
 [project.scripts]
 proto-agent = "proto_agent.main:main_cli"
 
@@ -23,8 +46,7 @@ requires = ["uv_build >= 0.7.19, <0.9.0"]
 build-backend = "uv_build"
 
 [tool.setuptools.packages.find]
-exclude = ["docs*"]
-
+exclude = ["docs*", "tests*"]
 
 [dependency-groups]
 dev = [
