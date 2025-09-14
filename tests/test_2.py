@@ -1,18 +1,38 @@
 import unittest
+import subprocess
 import sys
 import os
 
 
-class TestCalculatorFunctionality(unittest.TestCase):
-    def test_calculator_functioanlity(self):
-        sys.path.insert(
-            0, os.path.join(os.path.dirname(os.path.dirname(__file__)), "calculator")
-        )
-        try:
-            from pkg.calculator import Calculator  # type: ignore
+class TestCLI(unittest.TestCase):
+    """Test CLI functionality"""
 
-            calc = Calculator()
-            result = calc.evaluate("3 + 5")
-            self.assertEqual(result, 8)
-        finally:
-            sys.path.pop(0)
+    def test_cli_help(self):
+        try:
+            result = subprocess.run(
+                [sys.executable, "-m", "proto_agent.main", "--help"],
+                capture_output=True,
+                text=True,
+                timeout=10,
+                cwd=os.path.dirname(os.path.dirname(__file__)),
+            )
+            self.assertEqual(result.returncode, 0)
+            self.assertIn("Usage:", result.stdout)
+        except subprocess.TimeoutExpired:
+            self.skipTest("CLI help command timed out")
+
+    def test_cli_functioanlity(self):
+        try:
+            result = subprocess.run(
+                [sys.executable, "-m", "proto_agent.main", "--help"],
+                capture_output=True,
+                text=True,
+                timeout=10,
+                cwd=os.path.dirname(os.path.dirname(__file__)),
+            )
+            self.assertEqual(result.returncode, 0)
+            self.assertIn("WORKING_DIRECTORY", result.stdout)
+            self.assertIn("--verbose", result.stdout)
+            self.assertIn("--read-only", result.stdout)
+        except subprocess.TimeoutExpired:
+            self.skipTest("CLI help command timed out")

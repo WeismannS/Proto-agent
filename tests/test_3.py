@@ -1,38 +1,32 @@
 import unittest
-import subprocess
-import sys
-import os
+import tempfile
+from proto_agent.tool_kits import FileOperationToolkit, SystemInfoToolkit
+from proto_agent.tool_kit_registry import ToolKitRegistery
 
 
-class TestCLI(unittest.TestCase):
-    """Test CLI functionality"""
+class TestToolkits(unittest.TestCase):
+    """Test toolkit creation and basic functionality"""
 
-    def test_cli_help(self):
-        try:
-            result = subprocess.run(
-                [sys.executable, "-m", "proto_agent.main", "--help"],
-                capture_output=True,
-                text=True,
-                timeout=10,
-                cwd=os.path.dirname(os.path.dirname(__file__)),
-            )
-            self.assertEqual(result.returncode, 0)
-            self.assertIn("Usage:", result.stdout)
-        except subprocess.TimeoutExpired:
-            self.skipTest("CLI help command timed out")
+    def setUp(self):
+        ToolKitRegistery._functions.clear()
+        ToolKitRegistery._schemas.clear()
 
-    def test_cli_functioanlity(self):
-        try:
-            result = subprocess.run(
-                [sys.executable, "-m", "proto_agent.main", "--help"],
-                capture_output=True,
-                text=True,
-                timeout=10,
-                cwd=os.path.dirname(os.path.dirname(__file__)),
-            )
-            self.assertEqual(result.returncode, 0)
-            self.assertIn("--working-directory", result.stdout)
-            self.assertIn("--verbose", result.stdout)
-            self.assertIn("--read-only", result.stdout)
-        except subprocess.TimeoutExpired:
-            self.skipTest("CLI help command timed out")
+    def test_file_toolkit_creation(self):
+        toolkit = FileOperationToolkit()
+        self.assertIsNotNone(toolkit)
+        self.assertGreater(len(toolkit.schemas), 0)
+
+    def test_system_toolkit_creation(self):
+        toolkit = SystemInfoToolkit()
+        self.assertIsNotNone(toolkit)
+        self.assertGreater(len(toolkit.schemas), 0)
+
+    def test_toolkit_functionality(self):
+        with tempfile.TemporaryDirectory():
+            toolkit = FileOperationToolkit()
+            self.assertIsNotNone(toolkit.tool)
+            self.assertGreater(len(toolkit.tool.function_declarations), 0)
+
+        system_toolkit = SystemInfoToolkit()
+        self.assertIsNotNone(system_toolkit.tool)
+        self.assertGreater(len(system_toolkit.tool.function_declarations), 0)
