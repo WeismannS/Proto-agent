@@ -15,7 +15,11 @@ An educational AI agent framework demonstrating capability-based security and mo
 ### Installation
 
 ```bash
-pip install proto-agent # or if you prefer the cli to be used from anywhere: pip install --user proto-agent
+pip install proto-agent 
+# or if you prefer the cli to be used from anywhere
+uv tool install proto-agent  # Recommended
+# or using pipx
+pipx install proto-agent
 ```
 
 ### Configuration
