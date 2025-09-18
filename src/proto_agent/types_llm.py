@@ -5,6 +5,12 @@ LLM types module - defines standard types for LLM interactions using LiteLLM
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 from enum import Enum
+from typing import Generic, TypeVar
+
+from openai import BaseModel
+from pydantic import Field
+
+T = TypeVar("T")
 
 
 class Role(str, Enum):
@@ -92,23 +98,37 @@ class UsageMetadata:
     total_token_count: int
 
 
-@dataclass
-class GenerateContentResponse:
+class ExctractedWrapper(BaseModel, Generic[T]):
+    """Wrapper for extracted content"""
+
+    extracted_content: Optional[T] = Field(
+        description="Extracted content based on the provided model. CRITICAL: Do NOT include items with missing required fields. Do NOT use placeholder values like -1, 0, or empty strings for missing data. If a required field is missing from the input, EXCLUDE that entire item from the results."
+    )
+    reason: Optional[str] = Field(
+        None,
+        description="Explain what items were excluded and why. Be specific about which required fields were missing.",
+    )
+
+
+class GenerateContentResponse(Generic[T]):
     """Response from content generation"""
 
     text: Optional[str]
     function_calls: List[FunctionCall]
     usage_metadata: Optional[UsageMetadata] = None
+    response_object: Optional[ExctractedWrapper[T]] = None
 
     def __init__(
         self,
         text: Optional[str] = None,
         function_calls: Optional[List[FunctionCall]] = None,
         usage_metadata: Optional[UsageMetadata] = None,
+        response_object: Optional[ExctractedWrapper[T]] = None,
     ):
         self.text = text
         self.function_calls = function_calls or []
         self.usage_metadata = usage_metadata
+        self.response_object = response_object
 
 
 @dataclass

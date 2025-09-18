@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 import os
 
+
 from proto_agent.Config import SYSTEM_PROMPT
 from .agent_settings import AgentConfig
 from .agent import Agent
@@ -134,8 +135,9 @@ def main_cli(
     response = agent.generate_content(prompt=prompt)
     if not response:
         return
+
     print(response.text)
-    
+
     if verbose and response.usage_metadata:
         print(f"User prompt: {prompt}")
         print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")

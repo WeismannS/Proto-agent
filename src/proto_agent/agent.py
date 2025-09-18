@@ -3,19 +3,24 @@ from litellm import completion
 import json
 import time
 
+from pydantic import BaseModel
 from .Config import SYSTEM_PROMPT
 from .agent_settings import AgentConfig
 from .tool_kit_registry import ToolKitRegistery
 from .types_llm import (
     Content,
+    ExctractedWrapper,
     Part,
     FunctionCall,
     GenerateContentResponse,
     UsageMetadata,
 )
+from typing import TypeVar
+
+T = TypeVar("T", bound=BaseModel)
 
 
-def _create_error_response(function_name: str, error: str):
+def _create_error_response(function_name: str, error: str) -> Content:
     return Content(
         role="tool",
         parts=[
@@ -171,7 +176,9 @@ class Agent:
         self,
         prompt: str | None = None,
         messages: List[Content] | None = None,
-    ) -> GenerateContentResponse:
+        response_model: type[T] | None = None,
+        verbose: bool = False,
+    ) -> GenerateContentResponse[T]:
         if messages is None:
             if prompt is None:
                 raise ValueError("Either prompt or messages must be provided")
@@ -183,6 +190,7 @@ class Agent:
 
         working_messages = messages.copy()
         iterations = 0
+        is_verbose = verbose or self.settings.verbose
 
         while iterations < self.settings.max_iterations:
             try:
@@ -193,9 +201,10 @@ class Agent:
                     messages=self._litellm_messages,
                     tools=self._litellm_tools,
                     temperature=1.0,
+                    response_format=ExctractedWrapper[response_model],
                 )
                 end_time = time.time()
-                if self.settings.verbose:
+                if is_verbose:
                     print(
                         f"LiteLLM completion took {end_time - start_time:.2f} seconds"
                     )
@@ -208,7 +217,6 @@ class Agent:
                     raise Exception("No message in response choice")
 
                 response_text = getattr(message, "content", "")
-
                 # Check for tool calls
                 tool_calls = getattr(message, "tool_calls", None)
                 if not tool_calls:
@@ -222,16 +230,27 @@ class Agent:
                             ),
                             total_token_count=getattr(usage, "total_tokens", 0),
                         )
-                    assistant_content = Content(role="assistant", parts=[Part(text=response_text)])
-                    assistant_litellm_messages = self._convert_content_to_litellm_message(
-                        assistant_content
+                    assistant_content = Content(
+                        role="assistant", parts=[Part(text=response_text)]
                     )
+                    assistant_litellm_messages = (
+                        self._convert_content_to_litellm_message(assistant_content)
+                    )
+
                     self._litellm_messages.extend(assistant_litellm_messages)
+                    if response_model:
+                        parsed_data = json.loads(response_text)
+                        response_object = ExctractedWrapper(**parsed_data)
+                    else:
+                        response_object = None
+
                     return GenerateContentResponse(
                         text=response_text,
                         function_calls=[],
                         usage_metadata=usage_metadata,
+                        response_object=(response_object),
                     )
+
                 function_calls = []
                 function_call_parts = []
                 self._last_tool_call_ids = []
@@ -253,7 +272,7 @@ class Agent:
                     )
                     function_calls.append(function_call)
 
-                    if self.settings.verbose:
+                    if is_verbose:
                         print(
                             f"Calling function: {function_call.name}({function_call.args})"
                         )
@@ -279,9 +298,7 @@ class Agent:
 
                 function_response_parts = []
                 for function_call in function_calls:
-                    function_res = self.call_function(
-                        function_call, self.settings.verbose
-                    )
+                    function_res = self.call_function(function_call, is_verbose)
 
                     if (
                         function_res.parts is None
@@ -293,7 +310,7 @@ class Agent:
                         )
 
                     if (
-                        self.settings.verbose
+                        is_verbose
                         and function_res.parts[0].function_response
                         and function_res.parts[0].function_response.response
                     ):
