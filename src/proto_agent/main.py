@@ -135,6 +135,7 @@ def main_cli(
     if not response:
         return
     print(response.text)
+    
     if verbose and response.usage_metadata:
         print(f"User prompt: {prompt}")
         print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")

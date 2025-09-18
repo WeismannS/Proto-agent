@@ -1,6 +1,6 @@
 [project]
 name = "proto-agent"
-version = "0.6.1"
+version = "0.6.2"
 description = "A modular AI agent framework that can also be your local CLI agent!"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -8,7 +8,7 @@ dependencies = [
     "click>=8.2.1",
     "google>=3.0.0",
     "google-genai>=1.36.0",
-    "litellm>=1.52.0",
+    "litellm>=1.77.1",
     "platformdirs>=4.4.0",
     "psutil>=6.0.0",
     "python-dotenv==1.1.0",

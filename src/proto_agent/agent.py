@@ -212,7 +212,6 @@ class Agent:
                 # Check for tool calls
                 tool_calls = getattr(message, "tool_calls", None)
                 if not tool_calls:
-                    # Create usage metadata
                     usage_metadata = None
                     usage = getattr(response, "usage", None)
                     if usage:
@@ -223,7 +222,11 @@ class Agent:
                             ),
                             total_token_count=getattr(usage, "total_tokens", 0),
                         )
-
+                    assistant_content = Content(role="assistant", parts=[Part(text=response_text)])
+                    assistant_litellm_messages = self._convert_content_to_litellm_message(
+                        assistant_content
+                    )
+                    self._litellm_messages.extend(assistant_litellm_messages)
                     return GenerateContentResponse(
                         text=response_text,
                         function_calls=[],
