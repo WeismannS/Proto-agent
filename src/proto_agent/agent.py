@@ -201,8 +201,8 @@ class Agent:
                     messages=self._litellm_messages,
                     tools=self._litellm_tools,
                     temperature=1.0,
-                    response_format=ExctractedWrapper[response_model],
-                )
+                    response_format=ExctractedWrapper[response_model] if response_model else None,
+                ) 
                 end_time = time.time()
                 if is_verbose:
                     print(
